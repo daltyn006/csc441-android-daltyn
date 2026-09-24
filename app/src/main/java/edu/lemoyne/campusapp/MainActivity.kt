@@ -10,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import edu.lemoyne.campusapp.ui.theme.CampusAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,8 +19,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             CampusAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    // Class 5 | Step 6: MY GREETING
                     Greeting(
-                        name = "Android",
+                        name = "YOUR NAME",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -29,19 +29,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(name: String, modifier: Modifier = Modifier){
     Text(
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CampusAppTheme {
-        Greeting("Android")
-    }
 }
