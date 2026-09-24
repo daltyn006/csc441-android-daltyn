@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CampusApp</string>
+    <string modifier="Something" name="TODO">CampusApp</string>
 </resources>
