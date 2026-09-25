@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">CampusApp</string>
-    <string modifier="Something" name="TODO">CampusApp</string>
+    <!-- Lab 5 - Task 1: -->
+    <string name="app_name">Hiking Log</string>
 </resources>
