@@ -22,7 +22,8 @@ class MainActivity : ComponentActivity() {
                     // Class 5 | Step 6: MY GREETING
                     Greeting(
                         name = "YOUR NAME",
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+
                     )
                 }
             }
