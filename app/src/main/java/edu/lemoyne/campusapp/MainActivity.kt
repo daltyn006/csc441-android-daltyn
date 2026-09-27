@@ -1,9 +1,13 @@
 package edu.lemoyne.campusapp
 
+import android.content.res.Configuration
+import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 //import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +51,15 @@ class MainActivity : ComponentActivity() {
 // --- Class 6 | Step 1: My Own Screen ---
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    // --- Lab 6 - Task 3:a picture of my own ---
+    Image(
+        painter = painterResource(id = R.drawable.busybee),
+        contentDescription = "A busy bee",
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp) //sized up to be noticeable
+    )
+
     // --- Class 6 - Step 3 | a column so things stack ---
     Column(
         modifier = modifier
@@ -73,15 +88,27 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             text = "Characters", fontSize = 18.sp
         )
         Text(text = "Plotline", fontSize = 18.sp)
+        Text(text = "Points", fontSize = 18.sp)
+        // --- Lab 6 - Task 2: footer ---
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = "Last updated: September",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
+
 }
 
 // --- Class 6 - Step 2: preview ---
-@Preview
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HomeScreenPreview() {
-    CampusAppTheme() {
-        HomeScreen()
+    CampusAppTheme {
+        Surface {
+            HomeScreen()
+        }
+
     }
 }
 
