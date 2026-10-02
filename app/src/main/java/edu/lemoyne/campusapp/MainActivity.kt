@@ -90,7 +90,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(24.dp))
         // --- Class 7 Step 3: the text field ---
-        var newCharacter by remember{ mutableStateOf("")}
+        var newCharacter by remember { mutableStateOf("") }
 
         OutlinedTextField(
             value = newCharacter,
@@ -106,7 +106,12 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Text(text = "Points", fontSize = 18.sp)
         CounterDemo()
         Text(text = "Characters", fontSize = 18.sp)
-
+        // --- Lab 7 Task 4: a live characer counter ---
+        Text(
+            text = "${newCharacter.length} / 40",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         // --- Lab 6 - Task 2: footer ---
         Spacer(modifier = Modifier.height(24.dp))
         Text(
@@ -116,25 +121,34 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         )
         // --- Class 7 Step 2 : draw whatever is in the list ---
         val names = remember {
-            mutableStateListOf("Grant", "Manada", "Lindesay")
+            mutableStateListOf("")
         }
 
         Text(
-            text = "${names.size} characters",
+            text = if (names.size <= 1) "character" else "characters",
             fontWeight = FontWeight.Bold
         )
-        for(name in names){ Text(text = name, fontSize = 18.sp) }
+        for (name in names) {
+            Text(text = name, fontSize = 18.sp)
+        }
 
         // --- Class 7 Step 4: the button changes the state ---
         Button(onClick = {
             names.add(newCharacter)
             newCharacter = ""
-        }) {
-            Text("Add Character")
-        }
+        }) { Text("Add Character") }
+        Button(onClick = {
+//            names.removeAt(names.lastIndex)
+            if (names.isNotEmpty()) {
+                names.removeAt(names.lastIndex)
+            }
+        }) { Text("Remove Character") }
+        // --- Lab 3 Task 4: a live character counter ---
+        Button(onClick = {
+            names.clear()
+        }) { Text("Clear Characters") }
     }
     Spacer(modifier = Modifier.height(24.dp))
-
 }
 
 // --- Class 6 - Step 2: preview ---
@@ -163,9 +177,9 @@ fun HomeScreenPreview() {
 // ---Class 7 Step 1: a counter that remembers ---
 @Composable
 fun CounterDemo() {
-    var count by remember { mutableStateOf(0)}
+    var count by remember { mutableStateOf(0) }
     Button(onClick = {
-        count ++
+        count++
         println("count is now $count")
     }) {
         Text("Tapped $count times")
