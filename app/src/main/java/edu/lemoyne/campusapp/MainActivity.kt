@@ -44,12 +44,6 @@ class MainActivity : ComponentActivity() {
             CampusAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     HomeScreen(modifier = Modifier.padding(innerPadding))
-
-//                    Class 5 | Step 6: My Greeting
-//                    Greeting(
-//                      name = "Daltyn",
-//                      modifier = Modifier.padding(innerPadding),
-//                  )
                 }
             }
         }
@@ -92,10 +86,19 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         // --- Class 7 Step 3: the text field ---
         var newCharacter by remember { mutableStateOf("") }
 
+        // Class 8: Step 3 | check before continuing
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+
         OutlinedTextField(
             value = newCharacter,
-            onValueChange = { newCharacter = it },
+            //Class 8 : Step 4 | the feild return
+            onValueChange = {
+                newCharacter = it.take(MAX_NAME_LENGTH)
+                errorMessage = null
+            },
             label = { Text("Character Name") },
+            singleLine = true,
+            isError = errorMessage != null,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -103,12 +106,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
         Text(text = "Overall Progress:", fontSize = 18.sp)
         Text(text = "Plotline", fontSize = 18.sp)
-        Text(text = "Points", fontSize = 18.sp)
+        Text(text = "Plot Points", fontSize = 18.sp)
         CounterDemo()
         Text(text = "Characters", fontSize = 18.sp)
+
         // --- Lab 7 Task 4: a live characer counter ---
         Text(
-            text = "${newCharacter.length} / 40",
+            text = "${newCharacter.length} / $MAX_NAME_LENGTH",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -133,12 +137,33 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         }
 
         // --- Class 7 Step 4: the button changes the state ---
+        Button(
+            onClick = {
+                // Class 8: Step 3 | check before continuing
+                val issues = validateCharacterName(newCharacter, names)
+                if (issues == null) {
+                    names.add(newCharacter.trim())
+                    newCharacter = ""
+                    errorMessage = null
+                } else {
+                    errorMessage = issues
+                }
+            },
+            // Class 8 : Step 5 | informing the user
+            enabled = newCharacter.isNotBlank()
+        ) {
+            Text("Add Character")
+        }
+            // Class 8 : Step 4 | error message display
+        errorMessage?.let { message ->
+            Text(
+               text = message,
+               color = MaterialTheme.colorScheme.error,
+               fontSize = 14.sp
+            )
+        }
+
         Button(onClick = {
-            names.add(newCharacter)
-            newCharacter = ""
-        }) { Text("Add Character") }
-        Button(onClick = {
-//            names.removeAt(names.lastIndex)
             if (names.isNotEmpty()) {
                 names.removeAt(names.lastIndex)
             }
@@ -163,17 +188,6 @@ fun HomeScreenPreview() {
     }
 }
 
-
-//Class 5 | Step 6: My Greeting
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier){
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-// }
-
-
 // ---Class 7 Step 1: a counter that remembers ---
 @Composable
 fun CounterDemo() {
@@ -182,8 +196,31 @@ fun CounterDemo() {
         count++
         println("count is now $count")
     }) {
-        Text("Tapped $count times")
+        Text("$count")
     }
 }
+
+// --- Class 8 - Step 2: one real book for trail names ---
+const val MAX_NAME_LENGTH = 40
+const val MIN_NAME_LENGTH = 1
+
+//allows characters aA through zZ and digits
+val normChars = Regex("^[a-zA-Z0-9 '-]+$")
+
+fun validateCharacterName(input: String, existing: List<String>): String? {
+    val name = input.trim()
+    return when {
+        name.isEmpty() -> "Enter living character"
+        name.length > MAX_NAME_LENGTH -> "Limit to $MAX_NAME_LENGTH!"
+        // Lab 8 : Task 1 | minimum length && checks
+        name.length < MIN_NAME_LENGTH -> "Choose a name longer than: $MIN_NAME_LENGTH"
+        // Lab 8 : Task 2 | proper naming functions
+        !normChars.matches(name) -> "use non-special characters"
+        name.first().isLowerCase() -> "Use Correct Title"
+        existing.any { it.equals(name, ignoreCase = true) } -> "$name exists in the list"
+        else -> null
+    }
+}
+
 
 
