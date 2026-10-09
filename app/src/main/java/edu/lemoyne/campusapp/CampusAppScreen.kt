@@ -1,11 +1,8 @@
 package edu.lemoyne.campusapp
 
 import android.content.res.Configuration
-import android.net.TetheringManager
 import androidx.activity.compose.BackHandler
-import androidx.arch.core.internal.SafeIterableMap
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,18 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,14 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.lemoyne.campusapp.ui.theme.CampusAppTheme
-import org.w3c.dom.Text
 
 
 // --- Class 8 - Step 2: one real book for trail names ---
@@ -175,6 +167,7 @@ fun ListScreen(
     names: List<String>,
     onBack: () -> Unit,
     onRemove: (String) -> Unit,
+    onRemoveAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Class 9 : Step 6 | the phones back button goes home too
@@ -197,12 +190,29 @@ fun ListScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(18.dp))
+        // Lab 10 : Task 2 | remove all via the owner
+        if (names.isNotEmpty()) {
+            TextButton(onClick = onRemoveAll) {
+                Text(
+                    text = "Remove All",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(18.dp))
         // Class 10 : Step 5 | empty case
         if (names.isEmpty()) {
             Text(
                 text = "No Names Exist Yet.",
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant            )
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            // Lab 10 : Task 1 | Obvious home button on List Screen
+            Button(onClick = onBack) {
+                Text(text = "Home")
+            }
         } else {
             // Class 10 : Step 2 | Lazy Columns
             LazyColumn(
@@ -278,6 +288,7 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
                 names = names,
                 onBack = { currentScreen = "home" },
                 onRemove = { names.remove(it) },
+                onRemoveAll = { names.clear() },
                 modifier = modifier
             )
 
@@ -299,6 +310,7 @@ fun ListScreenPreview() {
         ListScreen(
             names = listOf("Grant", "Lindsey"),
             onRemove = {},
+            onRemoveAll = {},
             onBack = {}
         )
     }
@@ -410,7 +422,6 @@ fun validateCharacterName(input: String, existing: List<String>): String? {
             }
 
         }
-
         existing.any { it.equals(name, ignoreCase = true) } -> "Name exists in list"
         else -> null
     }
