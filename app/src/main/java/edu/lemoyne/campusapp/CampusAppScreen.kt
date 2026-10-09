@@ -7,20 +7,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,6 +51,10 @@ const val MIN_NAME_LENGTH = 1
 @Composable
 fun HomeScreen(
     names: List<String>,
+    sliderPosition: Float,
+    counterState: Int,
+    onIncrementCounter: () -> Unit,
+    onProgressChange: (Float) -> Unit,
     onAddNames: (String) -> Unit,
     onSeeAll: () -> Unit,
     onAbout: () -> Unit,
@@ -66,7 +77,7 @@ fun HomeScreen(
     // --- Class 6 - Step 3 | a column so things stack ---
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(24.dp)
     ) {
         // --- Class 6 - Step 4 | real styling ---
@@ -74,15 +85,22 @@ fun HomeScreen(
             text = "Novel Progress", fontSize = 32.sp, fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             text = "Chapters written:",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // --- Lab 7 Task 4: a live character counter ---
+        Text(
+            text = "Total Character Limit: ${newCharacter.length} / $MAX_NAME_LENGTH",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         OutlinedTextField(
             value = newCharacter,
@@ -97,22 +115,22 @@ fun HomeScreen(
             isError = errorMessage != null,
             modifier = Modifier.fillMaxWidth()
         )
+        // Class 8 : Step 4 | error message display
+        errorMessage?.let { message ->
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 14.sp
+            )
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = "Overall Progress:", fontSize = 18.sp)
-        Text(text = "Plotline", fontSize = 18.sp)
-        Text(text = "Plot Points", fontSize = 18.sp)
-        Text(text = "Characters", fontSize = 18.sp)
-
-        // --- Lab 7 Task 4: a live character counter ---
         Text(
-            text = "${newCharacter.length} / $MAX_NAME_LENGTH",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = "${names.size} " + if (names.size == 1) "character" else "characters",
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         // --- Class 7 Step 4: the button changes the state ---
         Button(
@@ -127,25 +145,69 @@ fun HomeScreen(
             Text("Add Character")
         }
 
-        // Class 8 : Step 4 | error message display
-        errorMessage?.let { message ->
-            Text(
-                text = message,
-                color = MaterialTheme.colorScheme.error,
-                fontSize = 14.sp
-            )
-        }
 
-        // --- Lab 6 - Task 2: footer ---
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = "Overall Progress:", fontSize = 18.sp)
+        Slider(
+            value = sliderPosition,
+            onValueChange = onProgressChange,
+            valueRange = 0f..100f,
+            steps = 99
+        )
+        // display the slider position
         Text(
-            text = "Last updated: October",
-            fontSize = 12.sp,
+            text = "${sliderPosition.toInt()}%",
+            fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
-            text = "${names.size} " + if (names.size <= 1) "character" else "characters",
+            text = "Plot Points",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        //Revised counter demo to have a reliable state
+        CounterDemo(count = counterState, onIncrement = onIncrementCounter)
+
+        Text(
+            text = "Themes",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        // Horizontal pager using remember for single-session page state
+        // in progress, resuming at a later time
+//        val plotlines = remember { mutableStateListOf<String>() }
+//        val pagerState = rememberPagerState(pageCount = { plotlines.size + 1 })
+//
+//        HorizontalPager(
+//            state = pagerState,
+//            modifier = Modifier.fillMaxWidth()
+//        ) { onValueChange ->
+//            OutlinedTextField(
+//                verifyTheme(input = input)
+//                value = plotlines.getOrNull(pageIndex)?: "H",
+//                onValueChange = { input ->
+//                    val verified = verifyTheme(input)
+//                    if (pageIndex < plotlines.size) {
+//                        plotlines[pageIndex] = verified?: input
+//                    }
+//                    if (verified?.isNotEmpty() ?: false) {
+//                        plotlines.add(verified)
+//                    }
+//                },
+//                label = { Text("Theme / Plotline ${pageIndex + 1}") },
+//                singleLine = true,
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "${names.size} " + if (names.size == 1) "total character" else "total characters",
             fontWeight = FontWeight.Bold
         )
 
@@ -157,6 +219,16 @@ fun HomeScreen(
         Button(onClick = onAbout) {
             Text(text = "About")
         }
+
+        // Pushes footer to the bottom of the screen
+        Spacer(modifier = Modifier.weight(1f))
+
+        // --- Lab 6 - Task 2: footer ---
+        Text(
+            text = "Last updated: October",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -173,6 +245,11 @@ fun ListScreen(
     // Class 9 : Step 6 | the phones back button goes home too
     BackHandler(onBack = onBack)
 
+    var search by remember { mutableStateOf("") }
+    val filteredNames = names.filter { name ->
+        name.contains(search.trim(), ignoreCase = true)
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -183,9 +260,23 @@ fun ListScreen(
             text = "All names",
             fontSize = 20.sp
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Search bar for "See All Names" Screen
+        OutlinedTextField(
+            value = search,
+            onValueChange = { search = it },
+            label = { Text("Search Names") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Lab 9 : Step 1 | count on the list screen
         Text(
-            text = "total: ${names.size}",
+            text = "total: ${names.size}" + if (search.isNotBlank()) " (${filteredNames.size} matching)" else "",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -213,14 +304,19 @@ fun ListScreen(
             Button(onClick = onBack) {
                 Text(text = "Home")
             }
+        } else if (filteredNames.isEmpty()) {
+            Text(
+                text = "No names match $search",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         } else {
             // Class 10 : Step 2 | Lazy Columns
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
-
             ) {
-                items(names) { name ->
-                    callbacks(
+                items(filteredNames) { name ->
+                    Callbacks(
                         name = name,
                         onRemove = { onRemove(name) }
                     )
@@ -269,15 +365,22 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
 //        mutableStateListOf("")
 //    }
     val names = remember {
-        (1..60).map { "Test $it" }.toMutableStateList()
+        mutableStateListOf<String>()
     }
     // Class 9 : Step 4 | which screen is showing it's just state
     var currentScreen by rememberSaveable { mutableStateOf("home") }
+    var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
+    var counterState by rememberSaveable { mutableStateOf(0) }
+
     when (currentScreen) {
         "home" ->
             HomeScreen(
                 names = names,
                 onAddNames = { names.add(it) },
+                sliderPosition = sliderPosition,
+                counterState = counterState,
+                onIncrementCounter = { counterState++ },
+                onProgressChange = { sliderPosition = it },
                 onSeeAll = { currentScreen = "list" },
                 onAbout = { currentScreen = "about" },
                 modifier = modifier
@@ -335,6 +438,10 @@ fun HomeScreenPreview() {
         Surface {
             HomeScreen(
                 names = listOf("Grant", "Jemima", "Linda"),
+                sliderPosition = 50f,
+                counterState = 0,
+                onIncrementCounter = {},
+                onProgressChange = {},
                 onAddNames = {},
                 onAbout = {},
                 onSeeAll = {}
@@ -349,12 +456,11 @@ fun HomeScreenPreview() {
 
 // ---Class 7 Step 1: a counter that remembers ---
 @Composable
-fun CounterDemo() {
-    var count by remember { mutableStateOf(0) }
-    Button(onClick = {
-        count++
-        println("count is now $count")
-    }) {
+fun CounterDemo(
+    count: Int,
+    onIncrement: () -> Unit
+) {
+    Button(onClick = onIncrement) {
         Text("$count")
     }
 }
@@ -362,7 +468,7 @@ fun CounterDemo() {
 
 // Class 10 : Step 3 | One row, its own composable
 @Composable
-fun callbacks(
+fun Callbacks(
     name: String,
     onRemove: () -> Unit
 ) {
@@ -394,7 +500,7 @@ val normChars = Regex("^[A-Z][a-z]*([ '-][A-Z][a-z]*)*$")
 fun validateCharacterName(input: String, existing: List<String>): String? {
     val name = input.trim()
     return when {
-        name.isEmpty() -> "Enter living character"
+        name.isEmpty() -> null
         name.length > MAX_NAME_LENGTH -> "Limit to $MAX_NAME_LENGTH!"
         // Lab 8 : Task 1 | minimum length && checks
         name.length < MIN_NAME_LENGTH -> "Choose a name longer than: $MIN_NAME_LENGTH"
@@ -422,7 +528,18 @@ fun validateCharacterName(input: String, existing: List<String>): String? {
             }
 
         }
+
         existing.any { it.equals(name, ignoreCase = true) } -> "Name exists in list"
+        else -> null
+    }
+}
+
+
+fun verifyTheme(input: String): String? {
+    val name = input.trim()
+    return when {
+        name.isEmpty() -> null
+        name.length > MAX_NAME_LENGTH -> "Limit to $MAX_NAME_LENGTH!"
         else -> null
     }
 }
