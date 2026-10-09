@@ -2,7 +2,9 @@
 2. I default my phone to dark mode, so the background was automatically dark and i did not even think about that
 3. Not fully understanding the intro png, it loads too quickly for it to realistically have an effect past an .ico on the app directory
 
-// lab 7
+---
+
+> lab 7
 
 2026-10-02 16:25:26.704 28086-28086 InputEventReceiver edu.lemoyne.campusapp E Exception in NativeInputEventReceiver callbacks
 2026-10-02 16:25:26.704 28086-28086 InputEventReceiver edu.lemoyne.campusapp E Failed to dispatch motion event to Java
@@ -30,3 +32,11 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:906)
 | 6   | Abac-acadabara' | Add Character       | true    |
 | 7   | A$ba(acadabara  | Use Non-Special Characters       | true    |
 | 8   | bracadabra      | Use Correct Title       | true    |
+
+---
+
+> Lab 9
+
+1. After rotating I remained on the same screen I had been on, "onSeeAll" 
+2. My two items were not there and had been destoyed on the new render
+3. The difference is that remember only stores in volitile RAM while rememberSavable stores into more perminant memory, so that on recomposition perminant memory is saved but ram is refreshed.

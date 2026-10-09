@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -40,6 +41,7 @@ fun HomeScreen(
     names: List<String>,
     onAddNames: (String) -> Unit,
     onSeeAll: () -> Unit,
+    onAbout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     //Class 7: Step 3 | what's typed lives in state
@@ -147,6 +149,9 @@ fun HomeScreen(
         Button(onClick = onSeeAll) {
             Text(text = "See All Names")
         }
+        Button(onClick = onAbout) {
+            Text(text = "About")
+        }
     }
 }
 
@@ -171,6 +176,12 @@ fun ListScreen(
             text = "All names",
             fontSize = 20.sp
         )
+        // Lab 9 : Step 1 | count on the list screen
+        Text(
+            text = "total: ${names.size}",
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(modifier = Modifier.height(18.dp))
         for (name in names) {
             Text(
@@ -179,6 +190,37 @@ fun ListScreen(
                 modifier = Modifier.padding(vertical = 6.dp)
             )
         }
+
+    }
+}
+
+// Lab 9 : Task 2 | about screen
+@Composable
+fun AboutScreen(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    BackHandler(onBack = onBack)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+    ) {
+        TextButton(onClick = onBack) {
+            Text("Back")
+        }
+        Text(
+            text = "About",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Simple spreadsheet to show for the amount of characters in my novel.")
+        Text(text = "Built for CSC 441 by 'To Be Determined'.")
+        Text(text = "Future Plans -> \nMultiple Sections\nComplexity in the code")
+        Text(text = "Fields need to be truncated and more focused to one aspect of writing")
     }
 }
 
@@ -187,7 +229,7 @@ fun ListScreen(
 @Composable
 fun CampusAppScreen(modifier: Modifier = Modifier) {
     val names = remember {
-        mutableStateListOf("Grant", "Lindesay")
+        mutableStateListOf("")
     }
     // Class 9 : Step 4 | which screen is showing it's just state
     var currentScreen by rememberSaveable { mutableStateOf("home") }
@@ -197,12 +239,19 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
                 names = names,
                 onAddNames = { names.add(it) },
                 onSeeAll = { currentScreen = "list" },
+                onAbout = { currentScreen = "about" },
                 modifier = modifier
             )
 
         "list" ->
             ListScreen(
                 names = names,
+                onBack = { currentScreen = "home" },
+                modifier = modifier
+            )
+
+        "about" ->
+            AboutScreen(
                 onBack = { currentScreen = "home" },
                 modifier = modifier
             )
@@ -221,6 +270,17 @@ fun ListScreenPreview() {
             onBack = {}
         )
     }
+
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun AboutScreenPreview() {
+    CampusAppTheme {
+        AboutScreen(
+            onBack = {}
+        )
+    }
 }
 
 // --- Class 6 - Step 2: preview ---
@@ -232,6 +292,7 @@ fun HomeScreenPreview() {
             HomeScreen(
                 names = listOf("Grant", "Jemima", "Linda"),
                 onAddNames = {},
+                onAbout = {},
                 onSeeAll = {}
             )
         }
@@ -239,10 +300,7 @@ fun HomeScreenPreview() {
 }
 
 
-
-
-// Function Section
-
+// Functional Backend Section
 
 
 // ---Class 7 Step 1: a counter that remembers ---
