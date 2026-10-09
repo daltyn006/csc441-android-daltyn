@@ -1,0 +1,510 @@
+Index: app/src/main/java/edu/lemoyne/campusapp/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package edu.lemoyne.campusapp\r\n\r\nimport android.content.res.Configuration\r\nimport android.media.Image\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.annotation.DrawableRes\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.layout.Column\r\n//import androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.compose.runtime.snapshots.SnapshotStateList\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport edu.lemoyne.campusapp.ui.theme.CampusAppTheme\r\n\r\nclass MainActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        setContent {\r\n            CampusAppTheme {\r\n                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->\r\n                    HomeScreen(modifier = Modifier.padding(innerPadding))\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n// --- Class 6 | Step 1: My Own Screen ---\r\n@Composable\r\nfun HomeScreen(modifier: Modifier = Modifier) {\r\n    // --- Lab 6 - Task 3:a picture of my own ---\r\n    Image(\r\n        painter = painterResource(id = R.drawable.busybee),\r\n        contentDescription = \"A busy bee\",\r\n        modifier = Modifier\r\n            .fillMaxWidth()\r\n            .height(32.dp) //sized up to be noticeable\r\n    )\r\n\r\n    // --- Class 6 - Step 3 | a column so things stack ---\r\n    Column(\r\n        modifier = modifier\r\n            .fillMaxWidth()\r\n            .padding(start = 24.dp, top = 24.dp, end = 48.dp)\r\n    ) {\r\n        // --- Class 6 - Step 4 | real styling ---\r\n        Text(\r\n            text = \"Novel Progress\", fontSize = 32.sp, fontWeight = FontWeight.Bold\r\n        )\r\n\r\n        Spacer(modifier = modifier.height(8.dp))\r\n\r\n        Text(\r\n            text = \"Chapters written:\",\r\n            fontSize = 16.sp,\r\n            color = MaterialTheme.colorScheme.onSurfaceVariant\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(24.dp))\r\n        // --- Class 7 Step 3: the text field ---\r\n        var newCharacter by remember { mutableStateOf(\"\") }\r\n\r\n        // Class 8: Step 3 | check before continuing\r\n        var errorMessage by remember { mutableStateOf<String?>(null) }\r\n\r\n        OutlinedTextField(\r\n            value = newCharacter,\r\n            //Class 8 : Step 4 | the feild return\r\n            onValueChange = {\r\n                newCharacter = it.take(MAX_NAME_LENGTH)\r\n                errorMessage = null\r\n            },\r\n            label = { Text(\"Character Name\") },\r\n            singleLine = true,\r\n            isError = errorMessage != null,\r\n            modifier = Modifier.fillMaxWidth()\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(8.dp))\r\n\r\n        Text(text = \"Overall Progress:\", fontSize = 18.sp)\r\n        Text(text = \"Plotline\", fontSize = 18.sp)\r\n        Text(text = \"Plot Points\", fontSize = 18.sp)\r\n        CounterDemo()\r\n        Text(text = \"Characters\", fontSize = 18.sp)\r\n\r\n        // --- Lab 7 Task 4: a live characer counter ---\r\n        Text(\r\n            text = \"${newCharacter.length} / $MAX_NAME_LENGTH\",\r\n            fontSize = 12.sp,\r\n            color = MaterialTheme.colorScheme.onSurfaceVariant\r\n        )\r\n        // --- Lab 6 - Task 2: footer ---\r\n        Spacer(modifier = Modifier.height(24.dp))\r\n        Text(\r\n            text = \"Last updated: October\",\r\n            fontSize = 12.sp,\r\n            color = MaterialTheme.colorScheme.onSurfaceVariant\r\n        )\r\n        // --- Class 7 Step 2 : draw whatever is in the list ---\r\n        val names = remember {\r\n            mutableStateListOf(\"\")\r\n        }\r\n\r\n        Text(\r\n            text = if (names.size <= 1) \"character\" else \"characters\",\r\n            fontWeight = FontWeight.Bold\r\n        )\r\n        for (name in names) {\r\n            Text(text = name, fontSize = 18.sp)\r\n        }\r\n\r\n        // --- Class 7 Step 4: the button changes the state ---\r\n        Button(\r\n            onClick = {\r\n                // Class 8: Step 3 | check before continuing\r\n                val issues = validateCharacterName(newCharacter, names)\r\n                if (issues == null) {\r\n                    names.add(newCharacter.trim())\r\n                    newCharacter = \"\"\r\n                    errorMessage = null\r\n                } else {\r\n                    errorMessage = issues\r\n                }\r\n            },\r\n            // Class 8 : Step 5 | informing the user\r\n            enabled = newCharacter.isNotBlank()\r\n        ) {\r\n            Text(\"Add Character\")\r\n        }\r\n            // Class 8 : Step 4 | error message display\r\n        errorMessage?.let { message ->\r\n            Text(\r\n               text = message,\r\n               color = MaterialTheme.colorScheme.error,\r\n               fontSize = 14.sp\r\n            )\r\n        }\r\n\r\n        Button(onClick = {\r\n            if (names.isNotEmpty()) {\r\n                names.removeAt(names.lastIndex)\r\n            }\r\n        }) { Text(\"Remove Character\") }\r\n        // --- Lab 3 Task 4: a live character counter ---\r\n        Button(onClick = {\r\n            names.clear()\r\n        }) { Text(\"Clear Characters\") }\r\n    }\r\n    Spacer(modifier = Modifier.height(24.dp))\r\n}\r\n\r\n// --- Class 6 - Step 2: preview ---\r\n@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)\r\n@Composable\r\nfun HomeScreenPreview() {\r\n    CampusAppTheme {\r\n        Surface {\r\n            HomeScreen()\r\n        }\r\n\r\n    }\r\n}\r\n\r\n// ---Class 7 Step 1: a counter that remembers ---\r\n@Composable\r\nfun CounterDemo() {\r\n    var count by remember { mutableStateOf(0) }\r\n    Button(onClick = {\r\n        count++\r\n        println(\"count is now $count\")\r\n    }) {\r\n        Text(\"$count\")\r\n    }\r\n}\r\n\r\n// --- Class 8 - Step 2: one real book for trail names ---\r\nconst val MAX_NAME_LENGTH = 40\r\nconst val MIN_NAME_LENGTH = 1\r\n\r\n//allows characters aA through zZ and digits\r\nval normChars = Regex(\"^[a-zA-Z0-9 '-]+$\")\r\n\r\nfun validateCharacterName(input: String, existing: List<String>): String? {\r\n    val name = input.trim()\r\n    return when {\r\n        name.isEmpty() -> \"Enter living character\"\r\n        name.length > MAX_NAME_LENGTH -> \"Limit to $MAX_NAME_LENGTH!\"\r\n        // Lab 8 : Task 1 | minimum length && checks\r\n        name.length < MIN_NAME_LENGTH -> \"Choose a name longer than: $MIN_NAME_LENGTH\"\r\n        // Lab 8 : Task 2 | proper naming functions\r\n        !normChars.matches(name) -> \"use non-special characters\"\r\n        name.first().isLowerCase() -> \"Use Correct Title\"\r\n        existing.any { it.equals(name, ignoreCase = true) } -> \"$name exists in the list\"\r\n        else -> null\r\n    }\r\n}\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/edu/lemoyne/campusapp/MainActivity.kt b/app/src/main/java/edu/lemoyne/campusapp/MainActivity.kt
+--- a/app/src/main/java/edu/lemoyne/campusapp/MainActivity.kt	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ b/app/src/main/java/edu/lemoyne/campusapp/MainActivity.kt	(date 1791499925049)
+@@ -1,20 +1,20 @@
+ package edu.lemoyne.campusapp
+ 
+ import android.content.res.Configuration
+-import android.media.Image
+ import android.os.Bundle
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+-import androidx.annotation.DrawableRes
+ import androidx.compose.foundation.Image
+ import androidx.compose.foundation.layout.Column
+-//import androidx.compose.foundation.layout.Row
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.foundation.layout.fillMaxWidth
+ import androidx.compose.foundation.layout.height
+ import androidx.compose.foundation.layout.padding
++import androidx.compose.material3.Button
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedTextField
+ import androidx.compose.material3.Scaffold
+ import androidx.compose.material3.Surface
+ import androidx.compose.material3.Text
+@@ -24,7 +24,6 @@
+ import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.runtime.remember
+ import androidx.compose.runtime.setValue
+-import androidx.compose.runtime.snapshots.SnapshotStateList
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.res.painterResource
+ import androidx.compose.ui.text.font.FontWeight
+@@ -50,27 +49,29 @@
+ // --- Class 6 | Step 1: My Own Screen ---
+ @Composable
+ fun HomeScreen(modifier: Modifier = Modifier) {
+-    // --- Lab 6 - Task 3:a picture of my own ---
+-    Image(
+-        painter = painterResource(id = R.drawable.busybee),
+-        contentDescription = "A busy bee",
+-        modifier = Modifier
+-            .fillMaxWidth()
+-            .height(32.dp) //sized up to be noticeable
+-    )
++    // --- Class 6 - Step 3 | a column so things stack ---
++    Column(
++        modifier = modifier
++            .fillMaxWidth()
++            .padding(start = 24.dp, top = 24.dp, end = 48.dp)
++    ) {
++        // --- Lab 6 - Task 3: a picture of my own ---
++        Image(
++            painter = painterResource(id = R.drawable.busybee),
++            contentDescription = "A busy bee",
++            modifier = Modifier
++                .fillMaxWidth()
++                .height(32.dp) // sized up to be noticeable
++        )
+ 
+-    // --- Class 6 - Step 3 | a column so things stack ---
+-    Column(
+-        modifier = modifier
+-            .fillMaxWidth()
+-            .padding(start = 24.dp, top = 24.dp, end = 48.dp)
+-    ) {
++        Spacer(modifier = Modifier.height(8.dp))
++
+         // --- Class 6 - Step 4 | real styling ---
+         Text(
+             text = "Novel Progress", fontSize = 32.sp, fontWeight = FontWeight.Bold
+         )
+ 
+-        Spacer(modifier = modifier.height(8.dp))
++        Spacer(modifier = Modifier.height(8.dp))
+ 
+         Text(
+             text = "Chapters written:",
+@@ -79,6 +80,12 @@
+         )
+ 
+         Spacer(modifier = Modifier.height(24.dp))
++
++        // --- Class 7 Step 2 : draw whatever is in the list ---
++        val names = remember {
++            mutableStateListOf<String>()
++        }
++
+         // --- Class 7 Step 3: the text field ---
+         var newCharacter by remember { mutableStateOf("") }
+ 
+@@ -87,17 +94,20 @@
+ 
+         OutlinedTextField(
+             value = newCharacter,
+-            //Class 8 : Step 4 | the feild return
++            // Class 8 : Step 4 | the field return
+             onValueChange = {
+-                newCharacter = it.take(MAX_NAME_LENGTH)
+-                errorMessage = null
++                val updated = it.take(MAX_NAME_LENGTH)
++                newCharacter = updated
++                errorMessage = if (updated.isBlank()) null else validateCharacterName(updated, names)
+             },
++
+             label = { Text("Character Name") },
+             singleLine = true,
+             isError = errorMessage != null,
+             modifier = Modifier.fillMaxWidth()
+         )
+ 
++
+         Spacer(modifier = Modifier.height(8.dp))
+ 
+         Text(text = "Overall Progress:", fontSize = 18.sp)
+@@ -106,7 +116,7 @@
+         CounterDemo()
+         Text(text = "Characters", fontSize = 18.sp)
+ 
+-        // --- Lab 7 Task 4: a live characer counter ---
++        // --- Lab 7 Task 4: a live character counter ---
+         Text(
+             text = "${newCharacter.length} / $MAX_NAME_LENGTH",
+             fontSize = 12.sp,
+@@ -119,13 +129,9 @@
+             fontSize = 12.sp,
+             color = MaterialTheme.colorScheme.onSurfaceVariant
+         )
+-        // --- Class 7 Step 2 : draw whatever is in the list ---
+-        val names = remember {
+-            mutableStateListOf("")
+-        }
+ 
+         Text(
+-            text = if (names.size <= 1) "character" else "characters",
++            text = if (names.size == 1) "character" else "characters",
+             fontWeight = FontWeight.Bold
+         )
+         for (name in names) {
+@@ -135,27 +141,21 @@
+         // --- Class 7 Step 4: the button changes the state ---
+         Button(
+             onClick = {
+-                // Class 8: Step 3 | check before continuing
+-                val issues = validateCharacterName(newCharacter, names)
+-                if (issues == null) {
+-                    names.add(newCharacter.trim())
+-                    newCharacter = ""
+-                    errorMessage = null
+-                } else {
+-                    errorMessage = issues
+-                }
++                names.add(newCharacter.trim())
++                newCharacter = ""
++                errorMessage = null
+             },
+             // Class 8 : Step 5 | informing the user
+-            enabled = newCharacter.isNotBlank()
++            enabled = errorMessage == null && newCharacter.isNotBlank()
+         ) {
+             Text("Add Character")
+         }
+-            // Class 8 : Step 4 | error message display
++        // Class 8 : Step 4 | error message display
+         errorMessage?.let { message ->
+             Text(
+-               text = message,
+-               color = MaterialTheme.colorScheme.error,
+-               fontSize = 14.sp
++                text = message,
++                color = MaterialTheme.colorScheme.error,
++                fontSize = 14.sp
+             )
+         }
+ 
+@@ -168,8 +168,9 @@
+         Button(onClick = {
+             names.clear()
+         }) { Text("Clear Characters") }
+-    }
+-    Spacer(modifier = Modifier.height(24.dp))
++
++        Spacer(modifier = Modifier.height(24.dp))
++    }
+ }
+ 
+ // --- Class 6 - Step 2: preview ---
+@@ -180,7 +181,6 @@
+         Surface {
+             HomeScreen()
+         }
+-
+     }
+ }
+ 
+@@ -198,21 +198,44 @@
+ 
+ // --- Class 8 - Step 2: one real book for trail names ---
+ const val MAX_NAME_LENGTH = 40
+-const val MIN_NAME_LENGTH = 1
++const val MIN_NAME_LENGTH = 2
+ 
+-//allows characters aA through zZ and digits
+-val normChars = Regex("^[a-zA-Z0-9 '-]+$")
++// allows characters aA through zZ and digits
++val titleRegex = Regex("^[A-Z][a-z]*([ '-][A-Z][a-z]*)*$")
+ 
+ fun validateCharacterName(input: String, existing: List<String>): String? {
+     val name = input.trim()
++
+     return when {
+         name.isEmpty() -> "Enter living character"
+         name.length > MAX_NAME_LENGTH -> "Limit to $MAX_NAME_LENGTH!"
+-        // Lab 8 : Task 1 | minimum length && checks
++
++        // Lab 8 : Task 1 | minimum length check
+         name.length < MIN_NAME_LENGTH -> "Choose a name longer than: $MIN_NAME_LENGTH"
+-        // Lab 8 : Task 2 | proper naming functions
+-        !normChars.matches(name) -> "use non-special characters"
+-        name.first().isLowerCase() -> "Use Correct Title"
++
++        // Lab 8 : Task 2 | check titleRegex first; if invalid, inspect words algorithmically
++        !titleRegex.matches(name) -> {
++            if (name.any { !it.isLetter() && it != ' ' && it != '\'' && it != '-' }) {
++                "Only letters, spaces, hyphens, and apostrophes allowed"
++            } else {
++                // Split into words by space, hyphen, or apostrophe
++                val words = name.split(' ', '-', '\'')
++                val invalidWord = words.firstOrNull { word ->
++                    word.isNotEmpty() && (!word.first().isUpperCase() || !word.drop(1).all { it.isLowerCase() })
++                }
++
++                if (invalidWord != null) {
++                    if (!invalidWord.first().isUpperCase()) {
++                        "First letter of each word must be capitalized"
++                    } else {
++                        "Letters inside words must be lowercase"
++                    }
++                } else {
++                    "Check spacing and punctuation formatting"
++                }
++            }
++        }
++
+         existing.any { it.equals(name, ignoreCase = true) } -> "$name exists in the list"
+         else -> null
+     }
+@@ -220,3 +243,4 @@
+ 
+ 
+ 
++
+Index: .idea/codeStyles/codeStyleConfig.xml
+===================================================================
+diff --git a/.idea/codeStyles/codeStyleConfig.xml b/.idea/codeStyles/codeStyleConfig.xml
+deleted file mode 100644
+--- a/.idea/codeStyles/codeStyleConfig.xml	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ /dev/null	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
+@@ -1,5 +0,0 @@
+-<component name="ProjectCodeStyleConfiguration">
+-  <state>
+-    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+-  </state>
+-</component>
+\ No newline at end of file
+Index: .idea/.gitignore
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.gitignore	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ /dev/null	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
+@@ -1,3 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+Index: .idea/codeStyles/Project.xml
+===================================================================
+diff --git a/.idea/codeStyles/Project.xml b/.idea/codeStyles/Project.xml
+deleted file mode 100644
+--- a/.idea/codeStyles/Project.xml	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ /dev/null	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
+@@ -1,157 +0,0 @@
+-<component name="ProjectCodeStyleConfiguration">
+-  <code_scheme name="Project" version="173">
+-    <JavaCodeStyleSettings>
+-      <option name="IMPORT_LAYOUT_TABLE">
+-        <value>
+-          <package name="android" withSubpackages="true" static="true" />
+-          <package name="androidx" withSubpackages="true" static="true" />
+-          <package name="com" withSubpackages="true" static="true" />
+-          <package name="junit" withSubpackages="true" static="true" />
+-          <package name="net" withSubpackages="true" static="true" />
+-          <package name="org" withSubpackages="true" static="true" />
+-          <package name="java" withSubpackages="true" static="true" />
+-          <package name="javax" withSubpackages="true" static="true" />
+-          <package name="" withSubpackages="true" static="true" />
+-          <emptyLine />
+-          <package name="android" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="androidx" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="com" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="junit" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="net" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="org" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="java" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="javax" withSubpackages="true" static="false" />
+-          <emptyLine />
+-          <package name="" withSubpackages="true" static="false" />
+-          <emptyLine />
+-        </value>
+-      </option>
+-    </JavaCodeStyleSettings>
+-    <JetCodeStyleSettings>
+-      <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
+-    </JetCodeStyleSettings>
+-    <codeStyleSettings language="XML">
+-      <option name="FORCE_REARRANGE_MODE" value="1" />
+-      <indentOptions>
+-        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+-      </indentOptions>
+-      <arrangement>
+-        <rules>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>xmlns:android</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>xmlns:.*</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-              <order>BY_NAME</order>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>.*:id</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>.*:name</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>name</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>style</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>.*</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>^$</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-              <order>BY_NAME</order>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>.*</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-              <order>ANDROID_ATTRIBUTE_ORDER</order>
+-            </rule>
+-          </section>
+-          <section>
+-            <rule>
+-              <match>
+-                <AND>
+-                  <NAME>.*</NAME>
+-                  <XML_ATTRIBUTE />
+-                  <XML_NAMESPACE>.*</XML_NAMESPACE>
+-                </AND>
+-              </match>
+-              <order>BY_NAME</order>
+-            </rule>
+-          </section>
+-        </rules>
+-      </arrangement>
+-    </codeStyleSettings>
+-    <codeStyleSettings language="kotlin">
+-      <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
+-    </codeStyleSettings>
+-  </code_scheme>
+-</component>
+\ No newline at end of file
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.compose)\r\n}\r\n\r\nandroid {\r\n    namespace = \"edu.lemoyne.campusapp\"\r\n    compileSdk {\r\n        version = release(37)\r\n    }\r\n\r\n    defaultConfig {\r\n        applicationId = \"edu.lemoyne.campusapp\"\r\n        minSdk = 24\r\n        targetSdk = 37\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            optimization {\r\n                enable = false\r\n            }\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.activity.compose)\r\n    implementation(libs.androidx.compose.material3)\r\n    implementation(libs.androidx.compose.ui)\r\n    implementation(libs.androidx.compose.ui.graphics)\r\n    implementation(libs.androidx.compose.ui.tooling.preview)\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(libs.androidx.material3)\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.compose.ui.test.junit4)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    debugImplementation(libs.androidx.compose.ui.test.manifest)\r\n    debugImplementation(libs.androidx.compose.ui.tooling)\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ b/app/build.gradle.kts	(date 1791134910663)
+@@ -27,8 +27,8 @@
+         }
+     }
+     compileOptions {
+-        sourceCompatibility = JavaVersion.VERSION_11
+-        targetCompatibility = JavaVersion.VERSION_11
++        sourceCompatibility = JavaVersion.VERSION_17
++        targetCompatibility = JavaVersion.VERSION_17
+     }
+     buildFeatures {
+         compose = true
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"jbr-25\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\r\n  </component>\r\n  <component name=\"ProjectType\">\r\n    <option name=\"id\" value=\"Android\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ b/.idea/misc.xml	(date 1791568691112)
+@@ -1,9 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="jbr-25" project-jdk-type="JavaSDK">
+-    <output url="file://$PROJECT_DIR$/build/classes" />
+-  </component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="jbr-25" project-jdk-type="JavaSDK" />
+   <component name="ProjectType">
+     <option name="id" value="Android" />
+   </component>
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"VcsDirectoryMappings\">\r\n    <mapping directory=\"$PROJECT_DIR$\" vcs=\"Git\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+--- a/.idea/vcs.xml	(revision 145893f22afcfb5861d97c9cd3ef7ee8ae04902f)
++++ b/.idea/vcs.xml	(date 1791415027519)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="VcsDirectoryMappings">
+-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++    <mapping directory="" vcs="Git" />
+   </component>
+ </project>
+\ No newline at end of file

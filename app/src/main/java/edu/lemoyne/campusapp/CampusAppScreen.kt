@@ -1,16 +1,25 @@
 package edu.lemoyne.campusapp
 
 import android.content.res.Configuration
+import android.net.TetheringManager
 import androidx.activity.compose.BackHandler
+import androidx.arch.core.internal.SafeIterableMap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,13 +31,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.lemoyne.campusapp.ui.theme.CampusAppTheme
+import org.w3c.dom.Text
 
 
 // --- Class 8 - Step 2: one real book for trail names ---
@@ -161,6 +174,7 @@ fun HomeScreen(
 fun ListScreen(
     names: List<String>,
     onBack: () -> Unit,
+    onRemove: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Class 9 : Step 6 | the phones back button goes home too
@@ -169,7 +183,7 @@ fun ListScreen(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp)
+            .padding(horizontal = 24.dp)
     ) {
         TextButton(onClick = onBack) { Text(text = "Back") }
         Text(
@@ -183,14 +197,26 @@ fun ListScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(18.dp))
-        for (name in names) {
+        // Class 10 : Step 5 | empty case
+        if (names.isEmpty()) {
             Text(
-                text = name,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(vertical = 6.dp)
-            )
-        }
+                text = "No Names Exist Yet.",
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant            )
+        } else {
+            // Class 10 : Step 2 | Lazy Columns
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
 
+            ) {
+                items(names) { name ->
+                    callbacks(
+                        name = name,
+                        onRemove = { onRemove(name) }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -228,8 +254,12 @@ fun AboutScreen(
 // Class 9 : Step 2 | one owner for the data
 @Composable
 fun CampusAppScreen(modifier: Modifier = Modifier) {
+    // Class 10 : Step 1 | list too long for screen
+//    val names = remember {
+//        mutableStateListOf("")
+//    }
     val names = remember {
-        mutableStateListOf("")
+        (1..60).map { "Test $it" }.toMutableStateList()
     }
     // Class 9 : Step 4 | which screen is showing it's just state
     var currentScreen by rememberSaveable { mutableStateOf("home") }
@@ -247,6 +277,7 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
             ListScreen(
                 names = names,
                 onBack = { currentScreen = "home" },
+                onRemove = { names.remove(it) },
                 modifier = modifier
             )
 
@@ -267,6 +298,7 @@ fun ListScreenPreview() {
     CampusAppTheme {
         ListScreen(
             names = listOf("Grant", "Lindsey"),
+            onRemove = {},
             onBack = {}
         )
     }
@@ -316,8 +348,35 @@ fun CounterDemo() {
 }
 
 
+// Class 10 : Step 3 | One row, its own composable
+@Composable
+fun callbacks(
+    name: String,
+    onRemove: () -> Unit
+) {
+    // Class 10 : Step 4 | remove button
+    TextButton(onClick = onRemove) {
+        Text("Remove Name")
+    }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 24.dp, vertical = 12.dp
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = name,
+                fontSize = 16.sp,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+
 //allows characters aA through zZ and digits, corrected to have it check all chars after allowed special
-//checks "oh something is wrong" then goes to say error -> hopefully faster on non-error
+//checks for "oh something is wrong" then goes to say error -> hopefully faster than always checking for specific error
 val normChars = Regex("^[A-Z][a-z]*([ '-][A-Z][a-z]*)*$")
 
 fun validateCharacterName(input: String, existing: List<String>): String? {
