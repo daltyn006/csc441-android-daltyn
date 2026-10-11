@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +32,10 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,10 +51,13 @@ import edu.lemoyne.campusapp.ui.theme.CampusAppTheme
 const val MAX_NAME_LENGTH = 40
 const val MIN_NAME_LENGTH = 1
 
+const val MAX_THEME_LENGTH = 60
+
 // --- Class 6 | Step 1: My Own Screen ---
 @Composable
 fun HomeScreen(
     names: List<String>,
+    plotlines: SnapshotStateList<String>,
     sliderPosition: Float,
     counterState: Int,
     onIncrementCounter: () -> Unit,
@@ -79,6 +86,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         // --- Class 6 - Step 4 | real styling ---
         Text(
@@ -179,31 +187,30 @@ fun HomeScreen(
         )
 
         // Horizontal pager using remember for single-session page state
-        // in progress, resuming at a later time
-//        val plotlines = remember { mutableStateListOf<String>() }
-//        val pagerState = rememberPagerState(pageCount = { plotlines.size + 1 })
-//
-//        HorizontalPager(
-//            state = pagerState,
-//            modifier = Modifier.fillMaxWidth()
-//        ) { onValueChange ->
-//            OutlinedTextField(
-//                verifyTheme(input = input)
-//                value = plotlines.getOrNull(pageIndex)?: "H",
-//                onValueChange = { input ->
-//                    val verified = verifyTheme(input)
-//                    if (pageIndex < plotlines.size) {
-//                        plotlines[pageIndex] = verified?: input
-//                    }
-//                    if (verified?.isNotEmpty() ?: false) {
-//                        plotlines.add(verified)
-//                    }
-//                },
-//                label = { Text("Theme / Plotline ${pageIndex + 1}") },
-//                singleLine = true,
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//        }
+        val pagerState = rememberPagerState(pageCount = { plotlines.size + 1 })
+
+        HorizontalPager(
+            state = pagerState,
+            pageSpacing = 8.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) { pageIndex ->
+            OutlinedTextField(
+                value = plotlines.getOrNull(pageIndex) ?: "",
+                onValueChange = { input ->
+                    val truncated = verifyTheme(input)
+                    if (pageIndex < plotlines.size) {
+                        plotlines[pageIndex] = truncated
+                    } else if (truncated.isNotBlank()) {
+                        plotlines.add(truncated)
+                    }
+                },
+                label = { Text("Theme / Plotline ${pageIndex + 1}") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
         Text(
@@ -367,6 +374,14 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
     val names = remember {
         mutableStateListOf<String>()
     }
+    val plotlines = rememberSaveable(
+        saver = listSaver(
+            save = { it.toList() },
+            restore = { it.toMutableStateList() }
+        )
+    ) {
+        mutableStateListOf<String>()
+    }
     // Class 9 : Step 4 | which screen is showing it's just state
     var currentScreen by rememberSaveable { mutableStateOf("home") }
     var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
@@ -376,6 +391,7 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
         "home" ->
             HomeScreen(
                 names = names,
+                plotlines = plotlines,
                 onAddNames = { names.add(it) },
                 sliderPosition = sliderPosition,
                 counterState = counterState,
@@ -438,6 +454,7 @@ fun HomeScreenPreview() {
         Surface {
             HomeScreen(
                 names = listOf("Grant", "Jemima", "Linda"),
+                plotlines = remember { mutableStateListOf() },
                 sliderPosition = 50f,
                 counterState = 0,
                 onIncrementCounter = {},
@@ -534,12 +551,6 @@ fun validateCharacterName(input: String, existing: List<String>): String? {
     }
 }
 
-
-fun verifyTheme(input: String): String? {
-    val name = input.trim()
-    return when {
-        name.isEmpty() -> null
-        name.length > MAX_NAME_LENGTH -> "Limit to $MAX_NAME_LENGTH!"
-        else -> null
-    }
+fun verifyTheme(input: String): String {
+    return input.replace("\n", "").replace("\r", "")
 }
