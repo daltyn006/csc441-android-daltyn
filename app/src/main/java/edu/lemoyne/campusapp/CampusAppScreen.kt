@@ -90,11 +90,11 @@ fun HomeScreen(
     ) {
         // --- Class 6 - Step 4 | real styling ---
         Text(
-            text = "Novel Progress", fontSize = 32.sp, fontWeight = FontWeight.Bold
+            text = "Novella", fontSize = 32.sp, fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Chapters written:",
+            text = "Chapters written: 13/25",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -356,10 +356,10 @@ fun AboutScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Simple spreadsheet to show for the amount of characters in my novel.")
+        Text(text = "Simple spreadsheet to show for the amount of characters in a novel.")
         Text(text = "Built for CSC 441 by 'To Be Determined'.")
-        Text(text = "Future Plans -> \nMultiple Sections\nComplexity in the code")
-        Text(text = "Fields need to be truncated and more focused to one aspect of writing")
+        Text(text = "Future Plans -> \nMore features and usability\nComplexity in the code")
+        Text(text = "Update program to be cross-session")
     }
 }
 
