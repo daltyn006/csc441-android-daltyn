@@ -90,11 +90,11 @@ fun HomeScreen(
     ) {
         // --- Class 6 - Step 4 | real styling ---
         Text(
-            text = "Novel Progress", fontSize = 32.sp, fontWeight = FontWeight.Bold
+            text = "Novella", fontSize = 32.sp, fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Chapters written:",
+            text = "Chapters written: 13/25",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
