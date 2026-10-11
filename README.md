@@ -5,9 +5,9 @@ A small in-development application that uses kotlin basics to assist in tracking
 ---
 
 ## Screens 
-Home: Where the magic happens, add names, add themes, count up points, and keep track of progress.
-List: Searchable screen with all stored names.
-About: Informative screen regarding the developer and roadmap.
+- *Home:* Where the magic happens, add names, add themes, count up points, and keep track of progress.
+- *List:* Searchable screen with all stored names.
+- *About:* Informative screen regarding the developer and roadmap.
 
 ## Input Rules
 **Character Names:** 
