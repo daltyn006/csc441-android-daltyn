@@ -14,6 +14,7 @@ A small in-development application that uses kotlin basics to assist in tracking
   - Only letters, hyphens, or apostrophes 
   - Must be between 3 and 40 letters
   - Must follow correct casing, e.g. Camel Case.
+
 **Themes:**
   - Scrollable, no newlines: single line only.
 
