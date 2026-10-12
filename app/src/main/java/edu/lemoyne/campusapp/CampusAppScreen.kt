@@ -357,7 +357,7 @@ fun AboutScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Simple spreadsheet to show for the amount of characters in a novel.")
-        Text(text = "Built for CSC 441 by 'To Be Determined'.")
+        Text(text = "Built for CSC 441 by 'To Be Determined'.\nPen name still underway.")
         Text(text = "Future Plans -> \nMore features and usability\nComplexity in the code")
         Text(text = "Update program to be cross-session")
     }
@@ -368,11 +368,8 @@ fun AboutScreen(
 @Composable
 fun CampusAppScreen(modifier: Modifier = Modifier) {
     // Class 10 : Step 1 | list too long for screen
-//    val names = remember {
-//        mutableStateListOf("")
-//    }
     val names = remember {
-        mutableStateListOf<String>()
+        mutableStateListOf<String>("Name 1", "Name 2", "Name 3", "Name 4", "Name 5")
     }
     val plotlines = rememberSaveable(
         saver = listSaver(
@@ -427,7 +424,7 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
 fun ListScreenPreview() {
     CampusAppTheme {
         ListScreen(
-            names = listOf("Grant", "Lindsey"),
+            names = listOf("Grant", "Linda", "Manada", "Anderson","Christoph"),
             onRemove = {},
             onRemoveAll = {},
             onBack = {}
@@ -453,7 +450,7 @@ fun HomeScreenPreview() {
     CampusAppTheme {
         Surface {
             HomeScreen(
-                names = listOf("Grant", "Jemima", "Linda"),
+                names = listOf("Name"),
                 plotlines = remember { mutableStateListOf() },
                 sliderPosition = 50f,
                 counterState = 0,
