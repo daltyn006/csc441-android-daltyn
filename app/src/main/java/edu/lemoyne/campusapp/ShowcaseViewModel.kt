@@ -15,7 +15,7 @@ class ShowcaseViewModel: ViewModel(){
     val uistate: StateFlow<ShowcaseUiState>()
 
     fun refresh (){
-        viewModel:Scope.launch {
+        ViewModelScope.launch {
             _uiState.value = ShowcaseUiState.loading
             try {
                 val item = repository.loadItems()
