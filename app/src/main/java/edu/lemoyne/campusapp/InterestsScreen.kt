@@ -28,10 +28,7 @@ fun InterestsScreen(
     modifier: Modifier = Modifier
 ) {
     BackHandler(onBack = onBack)
-
-    LaunchedEffect(Unit) {
-        onRefresh()
-    }
+    LaunchedEffect(Unit) { onRefresh() }
 
     Column(
         modifier = modifier
@@ -64,7 +61,7 @@ fun InterestsScreen(
 
             is ShowcaseUiState.Error -> {
                 Text(
-                    text = "Error: ${state.message ?: "network error"}",
+                    text = "Error: network error",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.error
                 )
