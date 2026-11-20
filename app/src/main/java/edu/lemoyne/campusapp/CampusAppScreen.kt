@@ -26,7 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -37,6 +36,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -65,6 +66,7 @@ fun HomeScreen(
     onAddNames: (String) -> Unit,
     onSeeAll: () -> Unit,
     onAbout: () -> Unit,
+    onInterests: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     //Class 7: Step 3 | what's typed lives in state
@@ -226,6 +228,9 @@ fun HomeScreen(
         Button(onClick = onAbout) {
             Text(text = "About")
         }
+        Button(onClick = onInterests) {
+            Text(text = "Interests Showcase")
+        }
 
         // Pushes footer to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -366,7 +371,12 @@ fun AboutScreen(
 
 // Class 9 : Step 2 | one owner for the data
 @Composable
-fun CampusAppScreen(modifier: Modifier = Modifier) {
+fun CampusAppScreen(
+    showcaseViewModel: ShowcaseViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
+    val showcaseState by showcaseViewModel.uistate.collectAsStateWithLifecycle()
+
     // Class 10 : Step 1 | list too long for screen
     val names = remember {
         mutableStateListOf<String>("Name 1", "Name 2", "Name 3", "Name 4", "Name 5")
@@ -396,6 +406,7 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
                 onProgressChange = { sliderPosition = it },
                 onSeeAll = { currentScreen = "list" },
                 onAbout = { currentScreen = "about" },
+                onInterests = { currentScreen = "interests" },
                 modifier = modifier
             )
 
@@ -412,6 +423,14 @@ fun CampusAppScreen(modifier: Modifier = Modifier) {
             AboutScreen(
                 onBack = { currentScreen = "home" },
                 modifier = modifier
+            )
+
+        "interests" ->
+            InterestsScreen(
+                state = showcaseState,
+                onBack = { currentScreen = "home" },
+                onRefresh = { showcaseViewModel.refresh() },
+                modifier = modifier,
             )
     }
 }

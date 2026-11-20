@@ -12,7 +12,7 @@ sealed class ShowcaseUiState {
     data class Error(val message: String?) : ShowcaseUiState()
 }
 
-class ShowcaseViewModel: ViewModel() {
+class ShowcaseViewModel : ViewModel() {
     private val repository = ShowcaseRepository()
     private val _uiState = MutableStateFlow<ShowcaseUiState>(ShowcaseUiState.Loading)
     val uistate = _uiState.asStateFlow()
@@ -27,6 +27,5 @@ class ShowcaseViewModel: ViewModel() {
                 _uiState.value = ShowcaseUiState.Error(error.message ?: "network error")
             }
         }
-
     }
 }
