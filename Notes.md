@@ -40,3 +40,12 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:906)
 1. After rotating I remained on the same screen I had been on, "onSeeAll" 
 2. My two items were not there and had been destoyed on the new render
 3. The difference is that remember only stores in volitile RAM while rememberSavable stores into more perminant memory, so that on recomposition perminant memory is saved but ram is refreshed.
+
+
+> Lab 21
+
+1. The launch of interests screen automatically calls the refresh function to load the items. 
+2. Tapping or clicking the refresh items button calls onRefresh() directly.
+3. onRefresh keeps InterestsScreen separate through state so it is easier to preview, test, and reuse without a ViewModel dependency.
+4. A successful list response returns contents cleanly as Success(emptyList()) and displays either "No items yet.", or the items in the list. A network or server error throws an exception into ShowcaseViewModel and displays an Error message.
+5. They both point to the same source, they both pull from supabase and display the items in the table - just like the website.
