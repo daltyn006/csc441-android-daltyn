@@ -1,7 +1,6 @@
 package edu.lemoyne.campusapp
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.Serializable
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,7 +15,7 @@ interface ShowcaseApi {
         @Header("authorization") authorization: String,
     ): List<ShowcaseItem>
 
-    @GET("/auth/v1/tolken?grant_type=password")
+    @GET("/auth/v1/token?grant_type=password")
     suspend fun signIn(
         @Header("apikey") apikey: String,
         @Body request: LoginRequest,
