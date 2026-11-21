@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.Header
+import retrofit2.http.POST
 
 
 interface ShowcaseApi {
@@ -15,7 +16,7 @@ interface ShowcaseApi {
         @Header("authorization") authorization: String,
     ): List<ShowcaseItem>
 
-    @GET("/auth/v1/token?grant_type=password")
+    @POST("/auth/v1/token?grant_type=password")
     suspend fun signIn(
         @Header("apikey") apikey: String,
         @Body request: LoginRequest,
