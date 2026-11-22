@@ -67,6 +67,7 @@ fun HomeScreen(
     onSeeAll: () -> Unit,
     onAbout: () -> Unit,
     onInterests: () -> Unit = {},
+    onLogin: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     //Class 7: Step 3 | what's typed lives in state
@@ -231,6 +232,9 @@ fun HomeScreen(
         Button(onClick = onInterests) {
             Text(text = "Interests Showcase")
         }
+        Button(onClick = onLogin) {
+            Text(text = "Login")
+        }
 
         // Pushes footer to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -373,9 +377,11 @@ fun AboutScreen(
 @Composable
 fun CampusAppScreen(
     showcaseViewModel: ShowcaseViewModel = viewModel(),
+    loginViewModel: LoginViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val showcaseState by showcaseViewModel.uistate.collectAsStateWithLifecycle()
+    val loginState by loginViewModel.state.collectAsStateWithLifecycle()
 
     // Class 10 : Step 1 | list too long for screen
     val names = remember {
@@ -407,6 +413,7 @@ fun CampusAppScreen(
                 onSeeAll = { currentScreen = "list" },
                 onAbout = { currentScreen = "about" },
                 onInterests = { currentScreen = "interests" },
+                onLogin = { currentScreen = "login" },
                 modifier = modifier
             )
 
@@ -430,7 +437,21 @@ fun CampusAppScreen(
                 state = showcaseState,
                 onBack = { currentScreen = "home" },
                 onRefresh = { showcaseViewModel.refresh() },
+                onLogin = { currentScreen = "login" },
                 modifier = modifier,
+            )
+
+        "login" ->
+            LoginScreen(
+                state = loginState,
+                onBack = { currentScreen = "home" },
+                onLogin = { email, password ->
+                    loginViewModel.login(email, password) { token ->
+                        showcaseViewModel.setAccessToken(token)
+                        currentScreen = "interests"
+                    }
+                },
+                modifier = modifier
             )
     }
 }

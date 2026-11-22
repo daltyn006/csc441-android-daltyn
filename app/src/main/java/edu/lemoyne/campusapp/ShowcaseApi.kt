@@ -40,8 +40,8 @@ object ShowcaseService {
 // Move this function from here to clean up and better swap this
 
 data class LoginRequest(
-    val username: String,
-    val password: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String,
 )
 
 data class LoginResponse(
