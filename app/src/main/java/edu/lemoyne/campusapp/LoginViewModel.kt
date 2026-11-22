@@ -18,13 +18,13 @@ class LoginViewModel : ViewModel() {
 
     fun login(email: String, password: String, onSuccess: (String) -> Unit) {
         viewModelScope.launch {
-
-            _state.value = LoginUiState(Loading = true)
+            _state.value = LoginUiState(Loading = true, Failed = false)
             try {
                 val token = repository.signIn(email, password)
-                _state.value = LoginUiState(Loading = false)
+                _state.value = LoginUiState(Loading = false, Failed = false)
                 onSuccess(token)
-            } catch (Error: Exception) {
+            } catch (e: Exception) {
+                _state.value = LoginUiState(Loading = false, Failed = true)
             }
         }
     }

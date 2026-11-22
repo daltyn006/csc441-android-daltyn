@@ -25,6 +25,7 @@ fun InterestsScreen(
     state: ShowcaseUiState,
     onBack: () -> Unit,
     onRefresh: () -> Unit,
+    onLogin: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     BackHandler(onBack = onBack)
@@ -40,6 +41,9 @@ fun InterestsScreen(
         }
         TextButton(onClick = onRefresh) {
             Text(text = "Refresh Items")
+        }
+        TextButton(onClick = onLogin) {
+            Text(text = "Login")
         }
 
         Text(
@@ -60,11 +64,17 @@ fun InterestsScreen(
             }
 
             is ShowcaseUiState.Error -> {
-                Text(
-                    text = "Error: network error",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.error
-                )
+                Column {
+                    Text(
+                        text = "Error: ${state.message ?: "network error"}",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextButton(onClick = onLogin) {
+                        Text(text = "Go to Login")
+                    }
+                }
             }
 
             is ShowcaseUiState.Success -> {

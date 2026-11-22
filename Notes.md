@@ -49,3 +49,8 @@ at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:906)
 3. onRefresh keeps InterestsScreen separate through state so it is easier to preview, test, and reuse without a ViewModel dependency.
 4. A successful list response returns contents cleanly as Success(emptyList()) and displays either "No items yet.", or the items in the list. A network or server error throws an exception into ShowcaseViewModel and displays an Error message.
 5. They both point to the same source, they both pull from supabase and display the items in the table - just like the website.
+
+
+## AI Usage:
+Ai was used to find the function            
+visualTransformation = PasswordVisualTransformation(),
